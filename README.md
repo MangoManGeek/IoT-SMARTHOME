@@ -1,2 +1,1 @@
-# IoT-RED-team
-For summer internship
+# IoT Blue Team
