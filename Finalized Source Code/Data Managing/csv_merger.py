@@ -22,20 +22,25 @@ def fixLine(line):
 
 total = list()
 firstFile = True
-root = "cc2650"
+root = "cc2650/"
+num_columns = 0
 for f in listdir(root):
     firstLine = True
-    for line in open(root+"/"+f,"r"):
+    for line in open(root+f,"r"):
         line = line.strip("\n")
         if "Time" in line:
             firstLine = True
         if(len(line)>0):
             if(firstLine):
                 if(firstFile):
-                    total.append(line.split(","))
+                    flp = line.split(",")
+                    total.append(flp)
+                    num_columns = len(flp)
             else:
                 temp = fixLine(line)
                 if temp is not None:
+                    if (len(temp)<num_columns):
+                        temp.append(None)
                     total.append(temp)
         firstLine = False
     firstFile = False
@@ -54,6 +59,7 @@ for n in range(len(total)):
                 stopIndex += 1
             while total[startIndex][i] is None:
                 startIndex -= 1
+            print((startIndex,stopIndex))
             line[i] = (total[stopIndex][i]+total[startIndex][i])/2
 
 totalR1 = total[0]
@@ -73,5 +79,5 @@ for line in total:
         string +="\n"
     string += lineText    
         
-open(root+"/combined.csv","w").write(string)
+open(root.strip("cc2650/")+"combined.csv","w").write(string)
     
