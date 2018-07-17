@@ -3,10 +3,11 @@ from sklearn.linear_model import Ridge
 import matplotlib.pyplot as plt
 import random
 
-root=""
-np_arr = np.genfromtxt(root+'combined.csv', delimiter=',')
-data = np_arr[:,1]
-data = [a if a is not None and a>0 else 0 for a in data]
+def extract_data_from_csv(root):
+    np_arr = np.genfromtxt(root+'combined.csv', delimiter=',')
+    data = np_arr[:,1]
+    data = [a if a is not None and a>0 else 0 for a in data]
+    return data
 
 
 def generateVectors(n,items):
@@ -23,7 +24,9 @@ def generatePredictions(clf,testing_vectors,n):
     predictions = list()
     vector = testing_vectors[0]
     for i in range(len(testing_vectors)):
-        prediction = float(clf.predict(vector)[0])
+        np_vector = np.array(vector)
+        np_vector = np_vector.reshape(1,-1)
+        prediction = float(clf.predict(np_vector)[0])
         predictions.append(prediction)
         if(i>0):
             if(i%n == 0):
@@ -42,52 +45,80 @@ def calculate_cost(clf,predictions,testing_labels):
         count += 1
     return total/count
 
-def fakeify(temps,testing_portion):
+def generate_fake(temps,testing_portion):
     variation = 1
     for i in range(int(len(temps)*(1-testing_portion)),len(temps)):
         temps[i] *= variation
         variation += random.uniform(-0.01,0.01)
     return temps
 
-data = fakeify(data,0.1)
+def plot(data_1, data_2):
+    plt.figure(1)
+    plt.subplot(211)
+    plt.plot(data_1)
+    plt.subplot(212)
+    plt.plot(data_2)
+    plt.show()
 
-clf = Ridge()
-n = 25
-stuff = generateVectors(n,data)
-vectors = stuff[0]
-labels = stuff[1]
-length = len(vectors)
-training_portion = 0.9
-training_len = int(length * training_portion)
+data = extract_data_from_csv("")
 
-training_vectors = np.array(vectors[:training_len])
-testing_vectors = vectors[training_len:]
+sample_size = 10000
 
-testing_labels = np.array(labels[training_len:])
-training_labels = np.array(labels[:training_len])
+def separateData(data,trainingSize,trainingStart,testingEnd):
+    gap_between_training_testing = int(len(data) * 0.1)
+    trainingStartIndex = int(len(data) * trainingStart)
+    testingEndIndex = int(len(data) * testingEnd)
+    interior_length = testingEndIndex - trainingStartIndex - gap_between_training_testing
+    num_training = int(trainingSize * interior_length)
+    num_testing = interior_length - trainingSize
+    trainingEndIndex = trainingStartIndex + num_training
+    testingStartIndex = trainingEndIndex+gap_between_training_testing
+    training_data = data[trainingStartIndex:trainingEndIndex]
+    testing_data = data[testingStartIndex:testingEndIndex]
+    return training_data,testing_data
 
-training_vectors = training_vectors.reshape(-1,n)
-#testing_vectors = testing_vectors.reshape(-1,n)
+def generateAllData(data,trainingSize,trainingStart,testingEnd,n,falsifyTesting):
+    training_data,testing_data = separateData(data,trainingSize,trainingStart,testingEnd)
+    if(falsifyTesting):
+        testing_data = generate_fake(testing_data,1)
+    training_vectors, training_labels = generateVectors(n,training_data)
+    testing_vectors,testing_labels = generateVectors(n,testing_data)
+    return training_vectors, training_labels, testing_vectors, testing_labels
+    
+
+def getTrainedModel(vectors, labels):
+    clf = Ridge()
+    clf.fit(vectors,labels)
+    return clf
+
+def computeCost(n,falsify):
+    print("Gathering data")
+    raw_data = extract_data_from_csv("")
+    training_vectors,training_labels,testing_vectors,testing_labels = generateAllData(raw_data,0.8,0,1,n,falsify)
+    print("Finished gathering data")
+    
+    print("training model")
+    clf = getTrainedModel(training_vectors,training_labels)
+    print("model trained")
+
+    print("generating predictions")
+    predictions = generatePredictions(clf,testing_vectors,n)
+    print("predictions generated")
+
+    cost = calculate_cost(clf,predictions,testing_labels)
+    print("Cost: "+str(cost))
+    return cost,testing_labels,predictions
+
+def main():
+    cost_normal,testing_labels,predictions = computeCost(10,False)
+    cost_falsified,testing_labels,predictions_falsified = computeCost(10,True)
+    print("Cost when data is not falsified: "+str(cost_normal))
+    print("Cost when data is falsified: "+str(cost_falsified))
+    plot(predictions,predictions_falsified)    
+
+main()
 
 
-
-plt.figure(1)
-plt.subplot(211)
-plt.plot(testing_labels)
-
-print("training model")
-clf.fit(training_vectors,training_labels)
-print("model trained")
-
-print("generating predictions")
-predictions = generatePredictions(clf,testing_vectors,n)
-print("predictions generated")
-
-print("Cost: "+str(calculate_cost(clf,predictions,testing_labels)))
-
-plt.subplot(212)
-plt.plot(predictions)
-plt.show()
     
 
 
