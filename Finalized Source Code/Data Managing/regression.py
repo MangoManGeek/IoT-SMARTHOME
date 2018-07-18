@@ -111,8 +111,9 @@ def generate_fake(data_list):
     #data converted back to list of 5-value pairs
     for i in range(len(array_2d[0])):
         paired_values = list()
-        for item in array_2d[i]:
-            if 
+        for arr in array_2d:
+            paired_values.append(arr[i])
+        new_array.append(paired_values)
     return new_array
 
 def plot(data_1, data_2):
@@ -169,7 +170,7 @@ def getRandomTestingDataSample(testing_sample_proportion, training_proportion, d
     return data[testing_sample_start_index:testing_sample_end_index]
 
 def quickComparison():
-    num_previous_values = 50
+    num_previous_values = 20
     num_future_values = 30
     print("Gathering data")
     raw_data = extract_data_from_csv("")
