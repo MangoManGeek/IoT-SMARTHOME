@@ -3,7 +3,7 @@ from datetime import datetime
 import time
 
 def fixLine(line):
-    parts = line.split(",")
+    parts = line.strip("\n").split(",")
     new_parts = None
     if(not parts[0]=="\n"):
         new_parts = list()
@@ -16,7 +16,7 @@ def fixLine(line):
             if len(part)<1:
                 new_parts.append(None)
             else:
-                new_parts.append(float(part))    
+                new_parts.append(float(part))
     return new_parts
 
 total = list()
@@ -35,12 +35,16 @@ for f in listdir(root):
                     flp = line.split(",")
                     total.append(flp)
                     num_columns = len(flp)
+                else:
+                    print("Removed: "+line)
             else:
                 temp = fixLine(line)
                 if temp is not None:
                     if (len(temp)<num_columns):
                         temp.append(None)
                     total.append(temp)
+                else:
+                    print("Removed: "+line)
         firstLine = False
     firstFile = False
 
@@ -67,7 +71,7 @@ for n in range(len(total)):
 
 totalR1 = total[0]
 totalRest = total[1:]
-totalRest.sort(key = lambda x:x[0])
+totalRest.sort(key = lambda x:time.mktime(datetime.strptime(x[0], '%Y-%m-%d %H:%M:%S').timetuple()))
 totalRest = totalRest[::-1]
 totalRest.append(totalR1)
 total = totalRest[::-1]
