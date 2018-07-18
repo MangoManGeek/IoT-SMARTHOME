@@ -9,10 +9,9 @@ def fixLine(line):
         new_parts = list()
         datetime_object = datetime.strptime(parts[0], '%Y-%m-%d %H:%M:%S.%f')
         time_tuple = datetime_object.timetuple()
-        absolute = time.mktime(time_tuple)
-        now = time.mktime(datetime.now().timetuple())
-        parts[0] = str(absolute-now)
-        for i in range(len(parts)):
+        parts[0] = str(time_tuple[0])+"-"+str(time_tuple[1])+"-"+str(time_tuple[2])+" "+str(time_tuple[3])+":"+str(time_tuple[4])+":"+str(time_tuple[5])
+        new_parts.append(parts[0])
+        for i in range(1,len(parts)):
             part = parts[i]
             if len(part)<1:
                 new_parts.append(None)
@@ -45,6 +44,8 @@ for f in listdir(root):
         firstLine = False
     firstFile = False
 
+for n in range(len(total)):
+    total[n] = total[n][:6]
 
 string = ""
 
@@ -52,7 +53,7 @@ for n in range(len(total)):
     line = total[n]
     for i in range(len(line)):
         part = line[i]
-        if part is None:
+        if part is None and i>0:
             startIndex = n-1
             stopIndex = n+1
             while total[stopIndex][i] is None:
@@ -68,6 +69,12 @@ totalRest.sort(key = lambda x:x[0])
 totalRest = totalRest[::-1]
 totalRest.append(totalR1)
 total = totalRest[::-1]
+total[0][0]= "AT(degC)"
+total[0][1]= "AT(degC)"
+total[0][2]= "OT(degC)"
+total[0][3]= "Humidity(RH)"
+total[0][4]= "Bar(millibars)"
+total[0][5]= "Light(lux)"
 
 for line in total:
     lineText = ""
