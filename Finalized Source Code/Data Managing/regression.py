@@ -8,9 +8,11 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.linear_model import ElasticNet
 import math
 
+#returns true if the data is a valid number
 def valid_data(item):
     return item is not None and not math.isnan(item)
 
+#takes the root directory for combined.csv as an argument, returns a tuple of corresponding values for each data entry
 def extract_data_from_csv(root):
     np_arr = np.genfromtxt(root+'combined.csv', delimiter=',')
     temp_data = list()
@@ -19,6 +21,7 @@ def extract_data_from_csv(root):
             temp_data.append((AT,OT,RH,Bar,Light))
     return temp_data
 
+# turns a list of tuples or lists into a 1D list
 def flatten(arr):
     flattened = list()
     for item in arr:
@@ -26,16 +29,19 @@ def flatten(arr):
             flattened.append(part)
     return flattened
 
+#generates vectors and labels based on a list of tuples and the number of preceding values that should be stored in each list
 def generateVectors(num_previous_values,items):
     vectors = list()
     labels = list()
     for i in range(len(items)-num_previous_values-1):
-        vector = flatten(items[i:i+num_previous_values])
+        previous_values_list = items[i:i+num_previous_values]
+        vector = flatten(previous_values_list)
         label = items[i+num_previous_values+1][0]
         vectors.append(vector)
         labels.append(label)
     return vectors,labels
 
+#generates a given number of predictions without checking for updated AT
 def generatePredictions(clf,testing_vectors,num_future_values):
     predictions = list()
     vector = testing_vectors[0]
@@ -46,12 +52,16 @@ def generatePredictions(clf,testing_vectors,num_future_values):
         predictions.append(prediction)
         if(i>0):
             if(i%num_future_values == 0):
+                #resets the value of the vector when the given prediction length has been reached
                 vector = testing_vectors[i]
             else:
                 vector=vector[5:]
+                #removes the first 5 values from the vector (gets rid of the previous data point from use in predictions)
                 vector.append(prediction)
+                #adds on the predicted temperature value as the temperature value for the next vector
                 for j in range(1,5):
                     vector.append(testing_vectors[i][j])
+                #adds on the current OT,RH, etc to complete the vector
     return predictions
 
 def calculate_cost(predictions,testing_labels):
@@ -68,12 +78,13 @@ def generate_fake_list(values):
     min_val = min(values)
     new_values = list()
     variation = 1
-    random.seed()
     for i in range(len(values)):
+        if(random.uniform(0,1)>0.9):
+            random.seed()        
         new_values.append(values[i] * variation)
         if(new_values[i]>max_val):
             variation -= 0.05
-        if(new_values[i]<min_val):
+        elif(new_values[i]<min_val):
             variation += 0.05
         elif(variation > 1.2):
             variation -= 0.05
@@ -84,11 +95,25 @@ def generate_fake_list(values):
     return new_values
     
 
-def generate_fake(two_dimensional_array):
-    new_two_dimensional_array = list()
-    for array in two_dimensional_array:
-        new_two_dimensional_array.append(generate_fake_list(array))
-    return new_two_dimensional_array
+#note to self: fix this method
+def generate_fake(data_list):
+    #data_list contains data as a list of 5-value tuples
+    array_2d = list()
+    #array_2d will be a list of 5 lists
+    for i in range(len(data_list[0])):
+        array = list()
+        for item in data_list:
+            array.append(item[i])
+        array = generate_fake_list(array)
+        #generates fake data within the array
+        array_2d.append(array)
+    new_array = list()
+    #data converted back to list of 5-value pairs
+    for i in range(len(array_2d[0])):
+        paired_values = list()
+        for item in array_2d[i]:
+            if 
+    return new_array
 
 def plot(data_1, data_2):
     plt.figure(1)

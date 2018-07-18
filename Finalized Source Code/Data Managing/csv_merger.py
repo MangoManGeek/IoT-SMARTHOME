@@ -45,7 +45,9 @@ for f in listdir(root):
     firstFile = False
 
 for n in range(len(total)):
-    total[n] = total[n][:6]
+    light_backup = total[n][14]
+    total[n] = total[n][:5]
+    total[n].append(light_backup)
 
 string = ""
 
