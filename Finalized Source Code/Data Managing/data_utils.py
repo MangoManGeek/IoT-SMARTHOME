@@ -1,8 +1,13 @@
 import numpy as np
 import math
 #takes the root directory for combined.csv as an argument, returns a tuple of corresponding values for each data entry
-def extract_data_from_csv(root):
+
+def get_np_arr(root):
     np_arr = np.genfromtxt(root+'combined.csv', delimiter=',')
+    return np_arr
+
+def extract_data_from_csv(root):
+    np_arr = get_np_arr(root)
     all_data = list()
     for time,AT,OT,RH,Bar,Light in np_arr:
         if valid_data(AT) and valid_data(OT) and valid_data(RH) and valid_data(Bar) and valid_data(Light):

@@ -218,6 +218,7 @@ def getRandomTestingDataSample(testing_sample_proportion, training_proportion, d
     #testing sample cannot begin any later than at the point after which it would exceed beyond the extent of the dataset
     testing_sample_start_index = random.randint(min_testing_sample_start_index, max_testing_sample_start_index)
     testing_sample_end_index = testing_sample_start_index+ int(testing_sample_proportion*dataset_size)
+    print("Sample size: "+str(testing_sample_end_index - testing_sample_start_index))
     return data[testing_sample_start_index:testing_sample_end_index]
 
 #trains model on one portion of the data, tests on other part-- both falsified and unfalsified-- and prints out both costs, as well as a graph comparing actual testing labels to their predicted values
@@ -246,21 +247,22 @@ def quickComparison():
     print("Cost when data is falsified: "+str(cost_falsified))
     plot(predictions,testing_labels)
 
-def getTemps(tuple_list):
+def getDataAtIndex(tuple_list,index):
     temps = list()
     for item in tuple_list:
-        temps.append(item[0])
+        temps.append(item[index])
     return temps
 
 def comparisonPlot():
     plt.figure(1)
     real_data= extract_data_from_csv("")
-    temps = getTemps(real_data)
-    print(temps[0:50])
-    plt.plot(temps)
     fake_data = generate_fake(real_data)
-    fake_temps = getTemps(fake_data)
-    plt.plot(fake_temps)
+
+    i=4
+    points = getDataAtIndex(real_data,i)
+    plt.plot(points)
+    points = getDataAtIndex(fake_data,i)
+    plt.plot(points)
     plt.show()
 
 #creates a list of costs for different samples
@@ -276,25 +278,42 @@ def generateCostDistribution(num_previous,num_future,falsified,size):
     print("model trained")
     costs = list()
     for i in range(size):
-        testing_data = getRandomTestingDataSample(0.1,training_proportion,raw_data)        
+        testing_data = getRandomTestingDataSample(0.02,training_proportion,raw_data)        
         costs.append(computeCost(num_previous,num_future,falsified,clf,testing_data)[0])
     return costs
 
-def main():
-    costs_falsified = generateCostDistribution(1,10000,True,100)
-    costs_unfalsified = generateCostDistribution(1,10000,False,100)
+def accuracy_with_cutoff(real_costs,fake_costs,cutoff):
+    accurate_count = 0
+    total_count = 0
+    for cost in real_costs:
+        if cost <= cutoff:
+            accurate_count += 1
+        total_count += 1
+    for cost in fake_costs:
+        if cost > cutoff:
+            accurate_count += 1
+        total_count += 1
+    return accurate_count/total_count
 
-    total = 0
-    count = 0
-    for cost in costs_falsified:
-        if cost>1.3:
-            count +=1
-        total +=1
-    for cost in costs_unfalsified:
-        if cost<1.3:
-            count += 1
-        total += 1
-    print(str(count/total))
+def find_threshold(real_costs,fake_costs,starting_cutoff,step):
+    baseline_accuracy = accuracy_with_cutoff(real_costs,fake_costs,starting_cutoff)
+    higher_cutoff = starting_cutoff + step
+    lower_cutoff = starting_cutoff - step
+    if(accuracy_with_cutoff(real_costs,fake_costs,lower_cutoff) > baseline_accuracy):
+        return find_threshold(real_costs,fake_costs,lower_cutoff,step)
+    elif(accuracy_with_cutoff(real_costs,fake_costs,higher_cutoff) > baseline_accuracy):
+        return find_threshold(real_costs,fake_costs,higher_cutoff,step)
+    else:
+        return starting_cutoff
+
+def main():
+    costs_falsified = generateCostDistribution(1,10000,True,1000)
+    costs_unfalsified = generateCostDistribution(1,10000,False,1000)
+
+    cutoff = find_threshold(costs_unfalsified,costs_falsified,1.2,0.025)
+    print("Ideal loss cutoff: "+str(cutoff))
+    print("Accuracy of prediction: "+str(accuracy_with_cutoff(costs_unfalsified,costs_falsified,cutoff)))
+    
     print("Graphing distribution of cost when modified and unmodified...")
     sns.set(color_codes=True)
     sns.distplot(costs_falsified)
