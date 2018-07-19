@@ -15,11 +15,11 @@ def valid_data(item):
 #takes the root directory for combined.csv as an argument, returns a tuple of corresponding values for each data entry
 def extract_data_from_csv(root):
     np_arr = np.genfromtxt(root+'combined.csv', delimiter=',')
-    temp_data = list()
+    all_data = list()
     for time,AT,OT,RH,Bar,Light in np_arr:
         if valid_data(AT) and valid_data(OT) and valid_data(RH) and valid_data(Bar) and valid_data(Light):
-            temp_data.append((AT,OT,RH,Bar,Light))
-    return temp_data
+            all_data.append((AT,OT,RH,Bar,Light))
+    return all_data
 
 # turns a list of tuples or lists into a 1D list
 def flatten(arr):
@@ -29,14 +29,18 @@ def flatten(arr):
             flattened.append(part)
     return flattened
 
-#generates vectors and labels based on a list of tuples and the number of preceding values that should be stored in each list
+#generates vectors and labels based on a list of tuples and the number of preceding values that should be represented in each vector
+#each vector is a list of previous values, where the corresponding label is the value that comes immediately afterwards
 def generateVectors(num_previous_values,items):
     vectors = list()
     labels = list()
     for i in range(len(items)-num_previous_values-1):
+        #the set of data points at index "i" are the first values of the vector
         previous_values_list = items[i:i+num_previous_values]
         vector = flatten(previous_values_list)
+        #turns the list of tuples (or lists) representing the previous values into a 1D vector
         label = items[i+num_previous_values+1][0]
+        #labels the vector with the next temperature value
         vectors.append(vector)
         labels.append(label)
     return vectors,labels
@@ -48,6 +52,7 @@ def generatePredictions(clf,testing_vectors,num_future_values):
     for i in range(len(testing_vectors)):
         np_vector = np.array(vector)
         np_vector = np_vector.reshape(1,-1)
+        #converts the vector to a 1-sample numpy vector in order to be used for prediction
         prediction = float(clf.predict(np_vector)[0])
         predictions.append(prediction)
         if(i>0):
@@ -170,12 +175,13 @@ def getRandomTestingDataSample(testing_sample_proportion, training_proportion, d
     return data[testing_sample_start_index:testing_sample_end_index]
 
 def quickComparison():
-    num_previous_values = 20
-    num_future_values = 30
+    num_previous_values = 1
+    num_future_values = 5000
     print("Gathering data")
     raw_data = extract_data_from_csv("")
     training_data, testing_data = separateData(raw_data,0.75,0,1)
     training_vectors,training_labels = generateVectors(num_previous_values,training_data)
+    print("Sample vector: "+str(training_vectors[0]))
     print("Finished gathering data")    
     print("training model")
     clf = getTrainedModel(training_vectors,training_labels)
