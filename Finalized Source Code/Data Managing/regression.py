@@ -287,11 +287,11 @@ def main():
     total = 0
     count = 0
     for cost in costs_falsified:
-        if cost>5.7:
+        if cost>1.3:
             count +=1
         total +=1
     for cost in costs_unfalsified:
-        if cost<5.7:
+        if cost<1.3:
             count += 1
         total += 1
     print(str(count/total))
