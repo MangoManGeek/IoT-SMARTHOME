@@ -9,6 +9,11 @@ from sklearn.linear_model import ElasticNet
 import math
 from data_utils import extract_data_from_csv
 from data_utils import valid_data
+from data_utils import getDataAtIndex
+from data_utils import separateData
+from fake_data import generate_fake_list
+from fake_data import generate_fake
+from data_utils import calculate_cost
 
 # turns a list of tuples or lists into a 1D list
 def flatten(arr):
@@ -61,22 +66,6 @@ def generatePredictions(clf,testing_vectors,num_future_values):
                 #this vector represents the state of the sensor one data point ago relative to the temperature it will be used to predict
     return predictions
 
-#calculates the cost, given a list of predictions and a list of actual values
-#assumes that each list is a one-dimensional list of numbers
-def calculate_cost(predictions,testing_labels):
-    total = 0
-    #total represents the total squared deviation
-    count = 0
-    #count represents the total number of values
-    for prediction,label in zip(predictions,testing_labels):
-        #loops through each prediction and each corresponding label
-        diff = prediction - label
-        #absolute difference
-        total += diff ** 2
-        #squared difference
-        count += 1
-    return (total/count) ** 0.5
-
 #calculates cost values at a specific interval
 def calculate_costs(bucket_size,predictions,testing_labels):
     costs = list()
@@ -88,87 +77,12 @@ def calculate_costs(bucket_size,predictions,testing_labels):
             costs.append(calculate_cost(prediction_set,testing_label_set))
     return costs
 
-#generates fake data from a 1D list
-#returns a new list with fake data
-def generate_fake_list(values):
-    max_val = max(values)
-    min_val = min(values)
-    #keeps track of the maximum and minimum values from the list to ensure that the fake data does not escape these bounds
-    new_values = list()
-    variation = 1
-    #[variation] represents the scale factor by which values are multiplied
-    #this value changes dynamically
-    for i in range(len(values)):
-        if(random.uniform(0,1)>0.9):
-            random.seed()
-            #resets the random library 10% of the time to ensure continued randomness
-        new_values.append(values[i] * variation)
-        if(new_values[i]>max_val):
-            variation -= 0.05
-        elif(new_values[i]<min_val):
-            variation += 0.05
-            #pushes the variation up or down depending on whether the new value has been pushed above or below the minimum
-        elif(variation > 1.2):
-            variation -= 0.05
-        elif(variation < 0.8):
-            variation += 0.05
-            #pushes the variation up or down depending on whether the variation has been pushed too high or too low
-        else:
-            variation += random.uniform(-0.015,0.015)
-            #changes the variation index by a random value
-    return new_values
-    
-#generates fake data for a list of paired data values (e.g. a list of tuples containing temperature, light, and humidity)
-#this is done by creating a separate list for each individual variable, using generate_fake_list to generate fake data for that variable, and then returning the data to its original format
-def generate_fake(data_list):
-    #data_list contains data as a list of x-value tuples
-    sample_tuple = data_list[0]
-    x = len(sample_tuple)
-    array_2d = list()
-    #array_2d will be a list of x lists
-    for i in range(x):
-        array = list()
-        for item in data_list:
-            array.append(item[i])
-        array = generate_fake_list(array)
-        #generates fake data within the array
-        array_2d.append(array)
-    new_array = list()
-    sample_list = array_2d[0]
-    list_len = len(sample_list)
-    #data converted back to list of x-value pairs
-    for i in range(list_len):
-        paired_values = list()
-        for arr in array_2d:
-            paired_values.append(arr[i])
-        new_array.append(paired_values)
-    return new_array
-
 #plots two 1D lists in the same figure using matplotlib
 def plot(data_1, data_2):
     plt.figure(1)
     plt.plot(data_1)
     plt.plot(data_2)
     plt.show()
-
-#separates list of values into training and testing portions with a gap between them equal to 10% of the dataset
-#trainingStart and testingEnd define the bounds within the dataset for data that will be used
-def separateData(data,trainingSize,trainingStart,testingEnd):
-    gap_between_training_testing = int(len(data) * 0.1)
-    #determines of the size of the temporal gap between training and testing
-    trainingStartIndex = int(len(data) * trainingStart)
-    testingEndIndex = int(len(data) * testingEnd)
-    interior_length = testingEndIndex - trainingStartIndex - gap_between_training_testing
-    #[interior_length] is equal to the size of training and testing data combined
-    num_training = int(trainingSize * interior_length)
-    #sets the size of the training set to be based on the desired training-to-testing ratio and the available data to be used for analysis
-    num_testing = interior_length - trainingSize
-    #sets testing to whatever is left
-    trainingEndIndex = trainingStartIndex + num_training
-    testingStartIndex = trainingEndIndex+gap_between_training_testing
-    training_data = data[trainingStartIndex:trainingEndIndex]
-    testing_data = data[testingStartIndex:testingEndIndex]
-    return training_data,testing_data
 
 #does a basic separation of training data and testing data, and then generates vectors and labels for both the training and testing set
 def generateAllData(data,trainingSize,trainingStart,testingEnd,num_previous_values,falsifyTesting):
@@ -247,12 +161,6 @@ def quickComparison():
     print("Cost when data is falsified: "+str(cost_falsified))
     plot(predictions,testing_labels)
 
-def getDataAtIndex(tuple_list,index):
-    temps = list()
-    for item in tuple_list:
-        temps.append(item[index])
-    return temps
-
 def comparisonPlot():
     plt.figure(1)
     real_data= extract_data_from_csv("")
@@ -278,7 +186,7 @@ def generateCostDistribution(num_previous,num_future,falsified,size):
     print("model trained")
     costs = list()
     for i in range(size):
-        testing_data = getRandomTestingDataSample(0.02,training_proportion,raw_data)        
+        testing_data = getRandomTestingDataSample(0.03,training_proportion,raw_data)        
         costs.append(computeCost(num_previous,num_future,falsified,clf,testing_data)[0])
     return costs
 
