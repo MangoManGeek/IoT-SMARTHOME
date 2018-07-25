@@ -1,4 +1,4 @@
-AT(degC),AT(degC),OT(degC),Humidity(RH),Bar(millibars),Light(lux)
+Time,AT(degC),OT(degC),Humidity(RH),Bar(millibars),Light(lux)
 2018-6-29 1:39:43,30.375,20.25,27.9968261719,1009.92,0.08
 2018-6-29 1:40:45,30.5,20.78125,27.9968261719,1009.91,0.08
 2018-6-29 1:41:46,30.5625,20.875,27.7038574219,1009.94,0.08

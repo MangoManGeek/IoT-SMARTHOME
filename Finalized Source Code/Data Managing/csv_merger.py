@@ -75,7 +75,7 @@ totalRest.sort(key = lambda x:time.mktime(datetime.strptime(x[0], '%Y-%m-%d %H:%
 totalRest = totalRest[::-1]
 totalRest.append(totalR1)
 total = totalRest[::-1]
-total[0][0]= "AT(degC)"
+total[0][0]= "Time"
 total[0][1]= "AT(degC)"
 total[0][2]= "OT(degC)"
 total[0][3]= "Humidity(RH)"
