@@ -24,12 +24,12 @@ def checkForGapsAfter(lastCheckedDate,root, min_size_seconds):
             if(gap_size> min_size_seconds):
                 if(len(log_file_output) > 0):
                     log_file_output += "\n"
-                log_file_output += str(int(gap_size))+"-SECOND GAP FOUND AT " + date_string
+                log_file_output += str(int(gap_size))+"-SECOND GAP FOUND ENDING AT " + date_string
         lastDate = date_seconds
     open("gap_log.txt","w").write(log_file_output)
     print("Wrote to gap_log.txt")
 
 
-checkForGapsAfter(None,"",90)
+checkForGapsAfter(None,"",9000)
         
         
