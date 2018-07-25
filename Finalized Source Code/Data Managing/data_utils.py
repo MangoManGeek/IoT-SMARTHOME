@@ -1,11 +1,21 @@
 import numpy as np
 import math
-#takes the root directory for combined.csv as an argument, returns a tuple of corresponding values for each data entry
+from datetime import datetime
+import time
+
+def datetime_object_from_text(x):
+    return datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
+
+def datetime_object_to_seconds(obj):
+    time_tuple = obj.timetuple()
+    return time.mktime(time_tuple)
+    
 
 def get_np_arr(root):
     np_arr = np.genfromtxt(root+'combined.csv', delimiter=',')
     return np_arr
 
+#takes the root directory for combined.csv as an argument, returns a tuple of corresponding values for each data entry
 def extract_data_from_csv(root):
     np_arr = get_np_arr(root)
     all_data = list()

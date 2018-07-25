@@ -28,12 +28,12 @@ def flatten(arr):
 def generateVectors(num_previous_values,items):
     vectors = list()
     labels = list()
-    for i in range(len(items)-num_previous_values-1):
+    for i in range(len(items)-num_previous_values):
         #the set of data points at index "i" are the first values of the vector
         previous_values_list = items[i:i+num_previous_values]
         vector = flatten(previous_values_list)
         #turns the list of tuples (or lists) representing the previous values into a 1D vector
-        label = items[i+num_previous_values+1][0]
+        label = items[i+num_previous_values][0]
         #labels the vector with the next temperature value
         vectors.append(vector)
         labels.append(label)

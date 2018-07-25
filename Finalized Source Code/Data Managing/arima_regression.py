@@ -7,9 +7,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from data_utils import calculate_cost
 from fake_data import generate_fake_list
+from data_utils import datetime_object_from_text
 
 def parser(x):
-    return datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
+    return datetime_object_from_text(x,)
 
 def generateTimeSeriesData(root):
     data = read_csv(root+"combined.csv",header=0,parse_dates=[0],index_col=0,date_parser = parser)
@@ -21,8 +22,8 @@ series = generateTimeSeriesData("")
 
 #takes in a list of time series data and outputs the trained model and its residuals
 def train_model(series):
-    model = ARIMA(series, order=(5,1,0))
-    model_fit = model.fit(disp=0)
+    model = ARIMA(series, order=(25,0,2))
+    model_fit = model.fit()
     residuals = model_fit.resid
     return model_fit, residuals
 
@@ -42,7 +43,7 @@ def comparison(root):
     time_series = generateTimeSeriesData(root)
     trainingEnd = int(len(time_series)/2)
     training = time_series[0:trainingEnd]
-    testing = time_series["AT(degC)"].toList()[trainingEnd:]
+    testing = time_series["AT(degC)"][trainingEnd:]
     model_fit, residuals = train_model(training)
     forecasted_data, rmse = predict(model_fit, testing)
     rmse_fake = calculate_cost(forecasted_data,generate_fake_list(testing))
