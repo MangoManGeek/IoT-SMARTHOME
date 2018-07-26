@@ -19,17 +19,18 @@ def checkForGapsAfter(lastCheckedDate,root, min_size_seconds):
     for date_string, date_seconds in all_dates:
         if(searchingForStartPoint and date_seconds >= last_checked_date_as_seconds):
             searchingForStartPoint = False
-        if(lastDate is not None):
-            gap_size = date_seconds - lastDate
-            if(gap_size> min_size_seconds):
-                if(len(log_file_output) > 0):
-                    log_file_output += "\n"
-                log_file_output += str(int(gap_size))+"-SECOND GAP FOUND ENDING AT " + date_string
-        lastDate = date_seconds
+        if(not searchingForStartPoint):
+            if(lastDate is not None):
+                gap_size = date_seconds - lastDate
+                if(gap_size> min_size_seconds):
+                    if(len(log_file_output) > 0):
+                        log_file_output += "\n"
+                    log_file_output += str(int(gap_size))+"-SECOND GAP FOUND ENDING AT " + date_string
+            lastDate = date_seconds
     open("gap_log.txt","w").write(log_file_output)
     print("Wrote to gap_log.txt")
 
 
-checkForGapsAfter(None,"",9000)
+checkForGapsAfter("2018-7-9 12:58:6","",300)
         
         
