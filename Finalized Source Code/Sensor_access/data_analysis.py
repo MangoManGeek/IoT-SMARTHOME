@@ -25,10 +25,10 @@ Not_Making_Coffee_Count=0
 
 
 USER='winlabiot@gmail.com'
-PASSWORD='winlabiot123'
+PASSWORD='password here'
 
 FROM ='winlabiot@gmail.com'
-TO='1165268303@qq.com'
+TO=['all to address here']
 
 CONTENT='Coffee will be served soon!'
 
@@ -40,8 +40,9 @@ def send_email(user, password, from_addr, to_addr, content):
 
 	response=server.login(user,password)
 	print str(datetime.now())+'		Server Response: '+str(response)
-	server.sendmail(from_addr,to_addr,content)
-	print str(datetime.now())'		Email Sent'
+	for to_addr in TO:
+		server.sendmail(FROM,to_addr,CONTENT)
+		print str(datetime.now())+'			Email Sent to '+str(to_addr)
 
 
 
