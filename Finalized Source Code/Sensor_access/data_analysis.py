@@ -18,6 +18,11 @@ CURR_DERIVATIVE_URL='http://{ip}:{port}/rest/items/DataAnalyzer_CurrentDerivativ
 DERIVATIVE_THRESHOLD_URL='http://{ip}:{port}/rest/items/DataAnalyzer_DerivativeThreshold'.format(port=PORT, ip=IP_ADDR)
 CURR_TIME_INTERVAL_URL='http://{ip}:{port}/rest/items/DataAnalyzer_CurrentTimeInterval'.format(port=PORT, ip=IP_ADDR)
 
+#constant to decide whether it is noise or not
+#avoid keep sending email when derivative always > threshold
+Making_Coffee=False
+Not_Making_Coffee_Count=0
+
 
 USER='winlabiot@gmail.com'
 PASSWORD='winlabiot123'
@@ -68,9 +73,18 @@ class analyzer:
 
 		if(self.derivative>self.derivative_threshold):
 			reponse=req.post(url, data='Making Coffee')
-			send_email(USER,PASSWORD,TO,FROM,CONTENT)
+			if(Making_Coffee==False and Not_Making_Coffee_Count>10):
+				send_email(USER,PASSWORD,TO,FROM,CONTENT)
+			
+			#update constant
+			Making_Coffee=True 
+			Not_Making_Coffee_Count=0
 		else:
-			reponse=req.post(url, data='Not Ready')			
+			reponse=req.post(url, data='Not Ready')	
+			
+			#update constant
+			Making_Coffee=False
+			Not_Making_Coffee_Count+=1
 
 
 
