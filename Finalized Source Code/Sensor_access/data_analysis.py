@@ -74,7 +74,7 @@ class analyzer:
 		if(self.derivative>self.derivative_threshold):
 			reponse=req.post(url, data='Making Coffee')
 			if(Making_Coffee==False and Not_Making_Coffee_Count>10):
-				send_email(USER,PASSWORD,TO,FROM,CONTENT)
+				send_email(USER,PASSWORD,FROM,TO,CONTENT)
 			
 			#update constant
 			Making_Coffee=True 
