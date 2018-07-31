@@ -40,9 +40,9 @@ def send_email(user, password, from_addr, to_addr, content):
 
 	response=server.login(user,password)
 	print str(datetime.now())+'		Server Response: '+str(response)
-	for to_addr in TO:
-		server.sendmail(FROM,to_addr,CONTENT)
-		print str(datetime.now())+'			Email Sent to '+str(to_addr)
+	for address in to_addr:
+		server.sendmail(from_addr,address,content)
+		print str(datetime.now())+'			Email Sent to '+str(address)
 
 
 
