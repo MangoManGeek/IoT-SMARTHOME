@@ -39,9 +39,9 @@ def send_email(user, password, from_addr, to_addr, content):
 	server.starttls()
 
 	response=server.login(user,password)
-	print 'Server Response: '+str(response)
+	print str(datetime.now())+'		Server Response: '+str(response)
 	server.sendmail(from_addr,to_addr,content)
-	print 'email sent'
+	print str(datetime.now())'		Email Sent'
 
 
 
