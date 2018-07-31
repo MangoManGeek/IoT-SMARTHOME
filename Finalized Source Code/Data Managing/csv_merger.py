@@ -24,29 +24,30 @@ firstFile = True
 root = "cc2650/"
 num_columns = 0
 for f in listdir(root):
-    firstLine = True
-    for line in open(root+f,"r"):
-        line = line.strip("\n")
-        if "Time" in line:
-            firstLine = True
-        if(len(line)>0):
-            if(firstLine):
-                if(firstFile):
-                    flp = line.split(",")
-                    total.append(flp)
-                    num_columns = len(flp)
+    if ".csv" in f:
+        firstLine = True
+        for line in open(root+f,"r"):
+            line = line.strip("\n")
+            if "Time" in line:
+                firstLine = True
+            if(len(line)>0):
+                if(firstLine):
+                    if(firstFile):
+                        flp = line.split(",")
+                        total.append(flp)
+                        num_columns = len(flp)
+                    else:
+                        print("Removed: "+line)
                 else:
-                    print("Removed: "+line)
-            else:
-                temp = fixLine(line)
-                if temp is not None:
-                    if (len(temp)<num_columns):
-                        temp.append(None)
-                    total.append(temp)
-                else:
-                    print("Removed: "+line)
-        firstLine = False
-    firstFile = False
+                    temp = fixLine(line)
+                    if temp is not None:
+                        if (len(temp)<num_columns):
+                            temp.append(None)
+                        total.append(temp)
+                    else:
+                        print("Removed: "+line)
+            firstLine = False
+        firstFile = False
 
 for n in range(len(total)):
     light_backup = total[n][14]

@@ -3,6 +3,9 @@ import math
 from datetime import datetime
 import time
 
+def string_from_datetime_object(x):
+    return x.strftime('%Y-%m-%d %H:%M:%S')
+
 def datetime_object_from_text(x):
     return datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
 
