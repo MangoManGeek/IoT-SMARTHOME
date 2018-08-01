@@ -235,19 +235,19 @@ def main_1():
     plt.show()
 
 def main_2():
-    predictor = Predictor(4,1,10000)
+    predictor = Predictor(0,1,10000)
     predictor.quickComparison()
 
 def store_training():
     predictor = Predictor(0,1,100000)
     vectors, labels = predictor.generateVectors(extract_data_from_csv(""))
     trained_model = getTrainedModel(vectors,labels)
-    s=joblib.dump(trained_model,"trained.pkl")
-    print(s)
+    file = open("trained.pkl","wb")
+    pickle.dump(trained_model,file,protocol = 0)
 
 #store_training()
 
-#main_2()
+main_2()
 
 
 #comparisonPlot()
