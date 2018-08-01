@@ -27,29 +27,36 @@ def flatten(arr):
 
 
 class Predictor:
-    def __init__(self,index_to_predict,num_previous_values,num_future_values):
+    def __init__(self,index_to_predict,num_previous_values,num_future_values,distance_in_future=1):
         self.index_to_predict = index_to_predict
         self.num_previous_values = num_previous_values
         self.num_future_values = num_future_values
+        self.distance_in_future = distance_in_future
 
     #generates vectors and labels based on a list of tuples and the number of preceding values that should be represented in each vector
     #each vector is a list of previous values, where the corresponding label is the value that comes immediately afterwards
     def generateVectors(self,items):
         vectors = list()
         labels = list()
-        for i in range(len(items)-self.num_previous_values):
+        for i in range(len(items)-self.num_previous_values- (self.distance_in_future-1)):
             #the set of data points at index "i" are the first values of the vector
             previous_values_list = items[i:i+self.num_previous_values]
             vector = flatten(previous_values_list)
             #turns the list of tuples (or lists) representing the previous values into a 1D vector
-            label = items[i+self.num_previous_values][self.index_to_predict]
+            label = items[i+self.num_previous_values+self.distance_in_future-1][self.index_to_predict]
             #labels the vector with the next temperature value
             vectors.append(vector)
             labels.append(label)
         return vectors,labels
 
-    #generates a given number of predictions without checking for updated AT
     def generatePredictions(self,clf,testing_vectors):
+        if(self.distance_in_future == 1):
+            return self.generatePredictions_multipleValues(clf,testing_vectors)
+        else:
+            return self.generatePredictions_oneValue(clf,testing_vectors)
+
+    #generates a given number of predictions without checking for updated value for the predicted variable
+    def generatePredictions_multipleValues(self,clf,testing_vectors):
         predictions = list()
         vector = testing_vectors[0]
         for i in range(len(testing_vectors)):
@@ -72,6 +79,15 @@ class Predictor:
                         vector.append(lastVector[j])
                     #adds on the next vector
                     #this vector represents the state of the sensor one data point ago relative to the temperature it will be used to predict
+        return predictions
+
+    #generates single predictions
+    def generatePredictions_oneValue(self,clf,testing_vectors):
+        predictions = list()
+        for vector in testing_vectors:
+            np_vector = np.array(vector)
+            np_vector = np_vector.reshape(1,-1)
+            predictions.append(clf.predict(np_vector))
         return predictions
     
     #does a basic separation of training data and testing data, and then generates vectors and labels for both the training and testing set
@@ -165,7 +181,7 @@ def plot(data_1, data_2):
 #the type of model that is trained depends on which "clf=" line is uncommented
 def getTrainedModel(vectors, labels):
     #clf = Lasso()
-    clf = ElasticNet()
+    clf = ElasticNet(alpha=0.25,l1_ratio=0.3)
     #clf = Ridge()
     clf.fit(vectors,labels)
     return clf
@@ -235,7 +251,7 @@ def main_1():
     plt.show()
 
 def main_2():
-    predictor = Predictor(0,1,10000)
+    predictor = Predictor(0,1,10000,distance_in_future=15)
     predictor.quickComparison()
 
 def store_training():

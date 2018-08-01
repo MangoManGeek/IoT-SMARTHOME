@@ -16,14 +16,21 @@ def datetime_object_to_seconds(obj):
 
 def get_np_arr(root):
     np_arr = np.genfromtxt(root+'combined.csv', delimiter=',')
+    i = 0
+    for line in open(root+"combined.csv","r"):
+        if i>0:
+            time = datetime_object_to_seconds(datetime_object_from_text(line.split(",")[0]))
+            np_arr[i][0] = time
+        i += 1
     return np_arr
 
 #takes the root directory for combined.csv as an argument, returns a tuple of corresponding values for each data entry
 def extract_data_from_csv(root):
     np_arr = get_np_arr(root)
+    last_time = None
     all_data = list()
     for time,AT,OT,RH,Bar,Light in np_arr:
-        if valid_data(AT) and valid_data(OT) and valid_data(RH) and valid_data(Bar) and valid_data(Light):
+        if (last_time is None or time-last_time>55) and valid_data(AT) and valid_data(OT) and valid_data(RH) and valid_data(Bar) and valid_data(Light):
             all_data.append((AT,OT,RH,Bar,Light))
     #all_data = all_data[::30]
     return all_data
