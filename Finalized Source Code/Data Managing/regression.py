@@ -6,6 +6,7 @@ import seaborn as sns
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import SGDRegressor
 from sklearn.linear_model import ElasticNet
+from sklearn.linear_model import Lars
 import math
 from data_utils import extract_data_from_csv
 from data_utils import valid_data
@@ -140,7 +141,7 @@ class Predictor:
         #plt.show()
         print("Cost when data is not falsified: "+str(cost_normal))
         print("Cost when data is falsified: "+str(cost_falsified))
-        plot(predictions,testing_labels)
+        plot(predictions_falsified,testing_labels)
 
     #creates a list of costs for different samples
     def generateCostDistribution(self,falsified,size):
@@ -181,7 +182,8 @@ def plot(data_1, data_2):
 #the type of model that is trained depends on which "clf=" line is uncommented
 def getTrainedModel(vectors, labels):
     #clf = Lasso()
-    clf = ElasticNet(alpha=0.25,l1_ratio=0.3)
+    #clf = ElasticNet(alpha=0.25,l1_ratio=0.3)
+    clf = Lars()
     #clf = Ridge()
     clf.fit(vectors,labels)
     return clf
@@ -203,7 +205,7 @@ def comparisonPlot():
     real_data= extract_data_from_csv("")
     fake_data = generate_fake(real_data)
 
-    i=4
+    i=1
     points = getDataAtIndex(real_data,i)
     plt.plot(points)
     points = getDataAtIndex(fake_data,i)
@@ -236,11 +238,11 @@ def find_threshold(real_costs,fake_costs,starting_cutoff,step):
 
 
 def main_1():
-    predictor = Predictor(0,1,10000)
-    costs_falsified = predictor.generateCostDistribution(True,1000)
-    costs_unfalsified = predictor.generateCostDistribution(False,1000)
+    predictor = Predictor(0,5,10000,distance_in_future=15)
+    costs_falsified = predictor.generateCostDistribution(True,50)
+    costs_unfalsified = predictor.generateCostDistribution(False,50)
 
-    cutoff = find_threshold(costs_unfalsified,costs_falsified,1.2,0.025)
+    cutoff = find_threshold(costs_unfalsified,costs_falsified,18,0.025)
     print("Ideal loss cutoff: "+str(cutoff))
     print("Accuracy of prediction: "+str(accuracy_with_cutoff(costs_unfalsified,costs_falsified,cutoff)))
     
@@ -251,7 +253,7 @@ def main_1():
     plt.show()
 
 def main_2():
-    predictor = Predictor(0,1,10000,distance_in_future=15)
+    predictor = Predictor(0,2,10000,distance_in_future=15)
     predictor.quickComparison()
 
 def store_training():
@@ -263,8 +265,7 @@ def store_training():
 
 #store_training()
 
-main_2()
-
+main_1()
 
 #comparisonPlot()
 

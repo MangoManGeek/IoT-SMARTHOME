@@ -25,7 +25,7 @@ def generate_fake_list(values):
             variation += 0.05
             #pushes the variation up or down depending on whether the variation has been pushed too high or too low
         else:
-            variation += random.uniform(-0.015,0.015)
+            variation += random.uniform(-0.0005,0.0005)
             #changes the variation index by a random value
     return new_values
 
