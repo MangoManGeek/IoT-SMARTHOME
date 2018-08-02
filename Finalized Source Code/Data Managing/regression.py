@@ -1,8 +1,6 @@
 import numpy as np
 from sklearn.linear_model import Ridge
-import matplotlib.pyplot as plt
 import random
-import seaborn as sns
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import SGDRegressor
 from sklearn.linear_model import ElasticNet
@@ -15,8 +13,6 @@ from data_utils import separateData
 from fake_data import generate_fake_list
 from fake_data import generate_fake
 from data_utils import calculate_cost
-import pickle
-import joblib
 
 # turns a list of tuples or lists into a 1D list
 def flatten(arr):
@@ -141,10 +137,10 @@ class Predictor:
         #plt.show()
         print("Cost when data is not falsified: "+str(cost_normal))
         print("Cost when data is falsified: "+str(cost_falsified))
-        plot(predictions_falsified,testing_labels)
+        return predictions,predictions_falsified,testing_labels
 
     #creates a list of costs for different samples
-    def generateCostDistribution(self,falsified,size):
+    def generateCostDistribution(self,falsified,size,num_datapoints_testing = -1):
         training_proportion = 0.5
         print("Gathering data")
         raw_data = extract_data_from_csv("")
@@ -156,7 +152,7 @@ class Predictor:
         print("model trained")
         costs = list()
         for i in range(size):
-            testing_data = getRandomTestingDataSample(0.03,training_proportion,raw_data)        
+            testing_data = getRandomTestingDataSample(0.03,training_proportion,raw_data,num_datapoints_testing)        
             costs.append(self.computeCost(falsified,clf,testing_data)[0])
         return costs
 
@@ -171,13 +167,6 @@ def calculate_costs(bucket_size,predictions,testing_labels):
             costs.append(calculate_cost(prediction_set,testing_label_set))
     return costs
 
-#plots two 1D lists in the same figure using matplotlib
-def plot(data_1, data_2):
-    plt.figure(1)
-    plt.plot(data_1)
-    plt.plot(data_2)
-    plt.show()
-    
 #trains a model with vectors and labels
 #the type of model that is trained depends on which "clf=" line is uncommented
 def getTrainedModel(vectors, labels):
@@ -189,28 +178,17 @@ def getTrainedModel(vectors, labels):
     return clf
 
 #generates random testing sample outside of training sample, given the proportion of the entire dataset that is to be composed of testing data
-def getRandomTestingDataSample(testing_sample_proportion, training_proportion, data):
+def getRandomTestingDataSample(testing_sample_proportion, training_proportion, data, num_datapoints_testing = -1):
     dataset_size = len(data)
+    num_datapoints_testing = int(dataset_size * testing_sample_proportion) if num_datapoints_testing == -1 else num_datapoints_testing
     min_testing_sample_start_index = int(dataset_size * training_proportion) + 1
     #testing sample must begin at least at the data point directly after the training data
-    max_testing_sample_start_index = int(dataset_size * (1-testing_sample_proportion))
+    max_testing_sample_start_index = dataset_size - num_datapoints_testing
     #testing sample cannot begin any later than at the point after which it would exceed beyond the extent of the dataset
     testing_sample_start_index = random.randint(min_testing_sample_start_index, max_testing_sample_start_index)
-    testing_sample_end_index = testing_sample_start_index+ int(testing_sample_proportion*dataset_size)
+    testing_sample_end_index = testing_sample_start_index+ num_datapoints_testing
     print("Sample size: "+str(testing_sample_end_index - testing_sample_start_index))
     return data[testing_sample_start_index:testing_sample_end_index]
-
-def comparisonPlot():
-    plt.figure(1)
-    real_data= extract_data_from_csv("")
-    fake_data = generate_fake(real_data)
-
-    i=1
-    points = getDataAtIndex(real_data,i)
-    plt.plot(points)
-    points = getDataAtIndex(fake_data,i)
-    plt.plot(points)
-    plt.show()
 
 def accuracy_with_cutoff(real_costs,fake_costs,cutoff):
     accurate_count = 0
@@ -237,37 +215,6 @@ def find_threshold(real_costs,fake_costs,starting_cutoff,step):
         return starting_cutoff
 
 
-def main_1():
-    predictor = Predictor(0,5,10000,distance_in_future=15)
-    costs_falsified = predictor.generateCostDistribution(True,50)
-    costs_unfalsified = predictor.generateCostDistribution(False,50)
-
-    cutoff = find_threshold(costs_unfalsified,costs_falsified,18,0.025)
-    print("Ideal loss cutoff: "+str(cutoff))
-    print("Accuracy of prediction: "+str(accuracy_with_cutoff(costs_unfalsified,costs_falsified,cutoff)))
-    
-    print("Graphing distribution of cost when modified and unmodified...")
-    sns.set(color_codes=True)
-    sns.distplot(costs_falsified)
-    sns.distplot(costs_unfalsified)
-    plt.show()
-
-def main_2():
-    predictor = Predictor(0,2,10000,distance_in_future=15)
-    predictor.quickComparison()
-
-def store_training():
-    predictor = Predictor(0,1,100000)
-    vectors, labels = predictor.generateVectors(extract_data_from_csv(""))
-    trained_model = getTrainedModel(vectors,labels)
-    file = open("trained.pkl","wb")
-    pickle.dump(trained_model,file,protocol = 0)
-
-#store_training()
-
-main_1()
-
-#comparisonPlot()
 
 
 

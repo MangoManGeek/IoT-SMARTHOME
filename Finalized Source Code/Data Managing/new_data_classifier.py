@@ -1,4 +1,3 @@
-import joblib
 from data_utils import extract_data_from_csv
 from regression import Predictor
 from datetime import datetime
@@ -17,11 +16,11 @@ def check_window(num_minutes,root):
     window = get_last_window(num_minutes,root)
     predictor = Predictor(0,1,10000)
     cost = predictor.computeCost(False,classifier,window)[0]
-    if(cost > 1.355):
+    if(cost > 18):
         open("falsified_log.txt","a").write("\n"+str(datetime.now())+" SUSPICIOUS DATA")
     else:
         open("falsified_log.txt","a").write("\n"+str(datetime.now())+" Data looks good")
 
 
 
-check_window(708,"")
+check_window(30,"")
