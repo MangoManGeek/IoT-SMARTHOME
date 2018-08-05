@@ -3,14 +3,27 @@ import requests as req
 
 import smtplib
 
+import mysql.connector
+
+#mysql constant
+MYSQL_HOST='den1.mysql6.gear.host'
+MYSQL_USER='winlabiot'
+MYSQL_PW='winlabiot+123'
+MYSQL_DB="winlabiot"
+Coffee_mailing_list_table='coffee_mailing_list'
+
+
+#keys in dict receive via socket
 TIME='time'
 AMBIENT_TEMP='ambient_temp'
 OBJECT_TEMP='object_temp'
 
+#preset values for derivative
 TIME_INTERVAL=300
 CURR_TIME_INTERVAL=0
 MAX_DATA_POINTS=100
 
+#openhab port and host
 IP_ADDR='localhost'
 PORT=8080
 
@@ -23,14 +36,36 @@ CURR_TIME_INTERVAL_URL='http://{ip}:{port}/rest/items/DataAnalyzer_CurrentTimeIn
 Making_Coffee=False
 Not_Making_Coffee_Count=0
 
-
+#gmail access
 USER='winlabiot@gmail.com'
-PASSWORD='password here'
+PASSWORD='winlabiot123'
 
+#email info
 FROM ='winlabiot@gmail.com'
-TO=['all to address here']
+TO=[]
 
 CONTENT='Coffee will be served soon!'
+
+def update_To_email_addr():
+	#global cursor
+	global TO
+
+	#connect to GearHost mysql database
+	GearHostMySQL = mysql.connector.connect(
+	  host=MYSQL_HOST,
+	  user=MYSQL_USER,
+	  passwd=MYSQL_PW,
+	  database=MYSQL_DB
+	)
+	cursor = GearHostMySQL.cursor()
+
+	cursor.execute("SELECT email FROM coffee_mailing_list;")
+	TO=cursor.fetchall()
+	cursor.close()
+	GearHostMySQL.close()
+
+
+
 
 
 def send_email(user, password, from_addr, to_addr, content):
@@ -39,7 +74,7 @@ def send_email(user, password, from_addr, to_addr, content):
 	server.starttls()
 
 	response=server.login(user,password)
-	print str(datetime.now())+'		Server Response: '+str(response)
+	print str(datetime.now())+'			Server Response: '+str(response)
 	for address in to_addr:
 		server.sendmail(from_addr,address,content)
 		print str(datetime.now())+'			Email Sent to '+str(address)
@@ -63,6 +98,10 @@ class analyzer:
 		self.derivative_threshold=derivative_threshold
 
 	def process(self,newPoint, url):
+
+		global Making_Coffee
+		global Not_Making_Coffee_Count
+
 		self.add_data_point(newPoint)
 		self.update_derivative()
 
@@ -75,17 +114,19 @@ class analyzer:
 		if(self.derivative>self.derivative_threshold):
 			reponse=req.post(url, data='Making Coffee')
 			if(Making_Coffee==False and Not_Making_Coffee_Count>10):
+				#update target email info
+				update_To_email_addr()
 				send_email(USER,PASSWORD,FROM,TO,CONTENT)
-			
 			#update constant
 			Making_Coffee=True 
 			Not_Making_Coffee_Count=0
 		else:
 			reponse=req.post(url, data='Not Ready')	
-			
+
 			#update constant
 			Making_Coffee=False
 			Not_Making_Coffee_Count+=1
+
 
 
 
