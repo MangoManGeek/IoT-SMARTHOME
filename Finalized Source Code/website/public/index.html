@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Coffee Subscribe</title>
+	<link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<body>
+
+<div>
+  <label for="email">Subscribe to our coffee machine notification!</label>
+  <input id="email_addr" type="email" value="" name="email" placeholder="email address" required>
+  <input id="submit" type="button" value="Subscribe" name="subscribe">
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#submit').click(function(){
+        $.post("/add", // file name TO BE CHANGED 
+        {
+          email: document.getElementById("email_addr").value,
+        },
+        function(data,status){
+          if (status === 'success'){
+       /*     $(window).load(function(){
+              sessionStorage.setItem('status','loggedIn');
+            });*/
+            window.location = data.redirect;
+          }
+          if (status === 'error'){
+            alert("Page not found");
+          }
+        });
+    });
+});
+</script>
+
+
+</body>
+</html>
