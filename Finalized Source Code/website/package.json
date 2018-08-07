@@ -1,0 +1,22 @@
+{
+  "name": "email_sub",
+  "version": "1.0.0",
+  "description": "Email subscribe to coffee machine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "email"
+  ],
+  "author": "Da Huo",
+  "license": "ISC",
+  "dependencies": {
+    "alert-node": "^1.2.1",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "mysql": "^2.16.0",
+    "popups": "^1.1.3"
+  }
+}
