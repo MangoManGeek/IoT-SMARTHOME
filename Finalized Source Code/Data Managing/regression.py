@@ -171,8 +171,8 @@ def calculate_costs(bucket_size,predictions,testing_labels):
 #the type of model that is trained depends on which "clf=" line is uncommented
 def getTrainedModel(vectors, labels):
     #clf = Lasso()
-    #clf = ElasticNet(alpha=0.25,l1_ratio=0.3)
-    clf = Lars()
+    clf = ElasticNet(alpha=0.25,l1_ratio=0.3)
+    #clf = Lars()
     #clf = Ridge()
     clf.fit(vectors,labels)
     return clf

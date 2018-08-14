@@ -35,6 +35,16 @@ def extract_data_from_csv(root):
     #all_data = all_data[::30]
     return all_data
 
+def extract_data_from_csv_with_time(root):
+    np_arr = get_np_arr(root)
+    last_time = None
+    all_data = list()
+    for time,AT,OT,RH,Bar,Light in np_arr:
+        if (last_time is None or time-last_time>55) and valid_data(AT) and valid_data(OT) and valid_data(RH) and valid_data(Bar) and valid_data(Light):
+            all_data.append((AT,OT,RH,Bar,Light))
+    #all_data = all_data[::30]
+    return all_data    
+
 #returns true if the data is a valid number
 def valid_data(item):
     return item is not None and not math.isnan(item)

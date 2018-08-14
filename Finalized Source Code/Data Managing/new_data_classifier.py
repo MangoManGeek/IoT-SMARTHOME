@@ -1,6 +1,7 @@
 from data_utils import extract_data_from_csv
 from regression import Predictor
 from datetime import datetime
+from emaillib import sendEmail
 import pickle
 
 def get_classifier(root):
@@ -14,10 +15,11 @@ def get_last_window(num_minutes,root):
 def check_window(num_minutes,root):
     classifier = get_classifier(root)
     window = get_last_window(num_minutes,root)
-    predictor = Predictor(0,1,10000)
+    predictor = Predictor(0,2,10000,distance_in_future=15)
     cost = predictor.computeCost(False,classifier,window)[0]
     if(cost > 18):
         open("falsified_log.txt","a").write("\n"+str(datetime.now())+" SUSPICIOUS DATA")
+        sendEmail("Suspicious data detected!","Please check your device for malfunction or report an attack.")        
     else:
         open("falsified_log.txt","a").write("\n"+str(datetime.now())+" Data looks good")
 
