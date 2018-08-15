@@ -97,7 +97,7 @@ class analyzer:
 		self.max_data_points=max_data_points
 		self.derivative_threshold=derivative_threshold
 
-	def process(self,newPoint, url):
+	def process(self,newPoint, url,update_monitor=True, email=True):
 
 		global Making_Coffee
 		global Not_Making_Coffee_Count
@@ -106,26 +106,38 @@ class analyzer:
 		self.update_derivative()
 
 		#update monitor 
-		reponse=req.post(CURR_DERIVATIVE_URL, data=str(self.derivative))
-		reponse=req.post(DERIVATIVE_THRESHOLD_URL, data=str(self.derivative_threshold))
-		reponse=req.post(CURR_TIME_INTERVAL_URL, data=str(self.curr_time_interval))
+		if update_monitor:
+			reponse=req.post(CURR_DERIVATIVE_URL, data=str(self.derivative))
+			reponse=req.post(DERIVATIVE_THRESHOLD_URL, data=str(self.derivative_threshold))
+			reponse=req.post(CURR_TIME_INTERVAL_URL, data=str(self.curr_time_interval))
+
+		#rv is whether making coffee regardless of noise
+		rv=False
 
 
 		if(self.derivative>self.derivative_threshold):
-			reponse=req.post(url, data='Making Coffee')
-			if(Making_Coffee==False and Not_Making_Coffee_Count>10):
+			if update_monitor:
+				reponse=req.post(url, data='Making Coffee')
+			if(Making_Coffee==False and Not_Making_Coffee_Count>10 and email):
 				#update target email info
 				update_To_email_addr()
 				send_email(USER,PASSWORD,FROM,TO,CONTENT)
+				rv=True
 			#update constant
 			Making_Coffee=True 
 			Not_Making_Coffee_Count=0
+
 		else:
-			reponse=req.post(url, data='Not Ready')	
+			if update_monitor:
+				reponse=req.post(url, data='Not Ready')	
 
 			#update constant
 			Making_Coffee=False
 			Not_Making_Coffee_Count+=1
+
+			rv= False
+
+		return rv
 
 
 
@@ -139,8 +151,8 @@ class analyzer:
 
 		#clear expired date if max data points is reached
 		if(len(self.data)>self.max_data_points):
-			del self.data[0:start_index]
-			start_index=0
+			del self.data[0:self.start_index]
+			self.start_index=0
 
 
 
