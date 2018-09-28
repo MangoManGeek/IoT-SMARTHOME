@@ -1,0 +1,168 @@
+{
+			  "label": "CC2650_Sensor01",
+			  "UID": "bluetooth:CC2650:01",
+			  "thingTypeUID": "bluetooth:CC2650",
+			  "channels": [
+			  	{
+			      "uid": "bluetooth:CC2650:01:connected",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:connected",
+			      "itemType": "String",
+			      "kind": "STATE",
+			      "label": "Connected",
+			      "description": "Connected",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:state",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:state",
+			      "itemType": "String",
+			      "kind": "STATE",
+			      "label": "State",
+			      "description": "state of coffee machine",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:object_temp",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:object_temp",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Object Temp (degC)",
+			      "description": "Object Temp (degC)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:ambient_temp",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:ambient_temp",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Ambient Temp (degC)",
+			      "description": "Abject Temp (degC)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:humidity",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:humidity",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Humidity (RH)",
+			      "description": "Humidity (RH)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:light",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:light",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Light (lux)",
+			      "description": "Light (lux)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:barometer",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:barometer",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Barometer (millibars)",
+			      "description": "Barometer (millibars)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:accelerometerx",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:accelerometerx",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Accelerometer-x (g)",
+			      "description": "Accelerometer-x (g)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:accelerometery",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:accelerometery",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Accelerometer-y (g)",
+			      "description": "Accelerometer-y (g)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:accelerometerz",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:accelerometerz",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Accelerometer-z (g)",
+			      "description": "Accelerometer-z (g)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:magnetometerx",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:magnetometerx",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Magnetometer-x (uT)",
+			      "description": "Magnetometer-x (uT)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:magnetometery",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:magnetometery",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Magnetometer-y (uT)",
+			      "description": "Magnetometer-y (uT)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:magnetometerz",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:magnetometerz",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Magnetometer-z (uT)",
+			      "description": "Magnetometer-z (uT)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:gyroscopex",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:gyroscopex",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Gyroscope-x (deg/sec)",
+			      "description": "Gyroscope-x (deg/sec)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:gyroscopey",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:gyroscopey",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Gyroscope-y (deg/sec)",
+			      "description": "Gyroscope-y (deg/sec)",
+			      "defaultTags": []
+			    },
+			    {
+			      "uid": "bluetooth:CC2650:01:gyroscopez",
+			      "id": "cc2650_channel01",
+			      "channelTypeUID": "bluetooth:gyroscopez",
+			      "itemType": "Number",
+			      "kind": "STATE",
+			      "label": "Gyroscope-z (deg/sec)",
+			      "description": "Gyroscope-z (deg/sec)",
+			      "defaultTags": []
+			    }
+			  ],
+			  "location": "Coffee Machine"
+			}
